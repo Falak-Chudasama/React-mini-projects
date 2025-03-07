@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 
 function App() {
 	const [password, setPassword] = useState("Password");
@@ -9,70 +9,112 @@ function App() {
 	const [hasSpecials, setHasSpecials] = useState(false);
 
 	function generatePassword() {
-		let lowerBound = 32;
-		let upperBound = 126;
+		if (!(hasCapitals || hasSmalls || hasNumbers || hasSpecials)) {
+			setPassword("-NoOptionSelected-");
+			return;
+		}
+		let dictionary = "";
+		if (hasSmalls) dictionary += "abcdefghijklmnopqrstuvwxyz";
+		if (hasCapitals) dictionary += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		if (hasNumbers) dictionary += "0123456789";
+		if (hasSpecials) dictionary += "!@#$%^&*()_+~`|}{[]:;?><,./-=";
 		let newPassword = "";
 
-		function isInRange(num, low, high) {
-			if (num >= low && num <= high) {
-				return true;
-			}
-			return false;
-		}
-
 		for (let i = 0; i < passLength; i++) {
-			const randomNumber = Math.floor(Math.random() * (upperBound - lowerBound)) + lowerBound;
-
-			if (!hasCapitals && isInRange(randomNumber, 65, 90)) {
-				i--;
-				continue;
-			}
-
-			if (!hasSmalls && isInRange(randomNumber, 97, 122)) {
-				i--;
-				continue;
-			}
-
-			if (!hasNumbers && isInRange(randomNumber, 48, 57)) {
-				i--;
-				continue;
-			}
-
-			if (!hasSpecials && (isInRange(randomNumber, 32, 47) || isInRange(randomNumber, 58, 64) || isInRange(randomNumber, 91, 96) || isInRange(randomNumber, 123, 126))) {
-				i--;
-				continue;
-			}
-
-			newPassword += String.fromCharCode(randomNumber);
+			const randomNumber = Math.floor(Math.random() * dictionary.length);
+			newPassword += dictionary.charAt(randomNumber);
 		}
 
 		setPassword(newPassword);
-		return password;
 	}
 
+	function copyToClipBoard() {
+		passwordRef.current?.select();
+		window.navigator.clipboard.writeText(password);
+	}
+
+	const passwordRef = useRef(null);
+
+	useEffect(() => {
+		generatePassword();
+	}, [hasCapitals, hasNumbers, hasSmalls, hasSpecials, passLength]);
+
 	return (
-		<>
-			<div className='w-screen h-screen bg-gray-900 flex items-center justify-center'>
-				<div className='p-4 grid gap-y-3 place-items-center'>
-					<h1 className='font-bold text-3xl px-4 py-2 rounded-md bg-yellow-300 text-black'>{password}</h1>
-					<button onClick={generatePassword} className='w-max text-black rounded-lg font-semibold px-2 py-1 bg-white duration-300'>Generate Password</button>
-					<button onClick={() => { setHasSmalls(!hasSmalls) }} className='w-max text-white rounded-lg font-semibold px-2 py-1 duration-300' style={{ backgroundColor: hasSmalls ? "green" : "red" }}>{hasSmalls ? "Exclude Lowercase" : "Include Lowercase"}</button>
-					<button onClick={() => { setHasCapitals(!hasCapitals) }} className='w-max text-white rounded-lg font-semibold px-2 py-1 duration-300' style={{ backgroundColor: hasCapitals ? "green" : "red" }}>{hasCapitals ? "Exclude Uppercase" : "Include Uppercase"}</button>
-					<button onClick={() => { setHasNumbers(!hasNumbers) }} className='w-max text-white rounded-lg font-semibold px-2 py-1 duration-300' style={{ backgroundColor: hasNumbers ? "green" : "red" }}>{hasNumbers ? "Exclude Numbers" : "Include Numbers"}</button>
-					<button onClick={() => { setHasSpecials(!hasSpecials) }} className='w-max text-white rounded-lg font-semibold px-2 py-1 duration-300' style={{ backgroundColor: hasSpecials ? "green" : "red" }}>{hasSpecials ? "Exclude Special Characters" : "Include Special Characters"}</button>
+		<div className="w-screen h-screen bg-gray-900 flex items-center justify-center">
+			<div className="p-6 bg-gray-800 rounded-lg shadow-xl flex flex-col items-center gap-4">
+				<input type="text" readOnly className="font-bold text-3xl px-6 py-3 rounded-xl bg-white text-black text-center" ref={passwordRef} value={password}>
+				</ input>
+
+				<div className="grid grid-cols-2 gap-3 w-full">
+					<button
+						onClick={copyToClipBoard}
+						className=" text-white rounded-lg font-semibold px-4 py-2 bg-slate-500 hover:bg-slate-500 duration-300"
+					>
+						Copy Password
+					</button>
+
+					<button
+						onClick={generatePassword}
+						className=" text-white rounded-lg font-semibold px-4 py-2 bg-blue-500 hover:bg-blue-600 duration-300"
+					>
+						Generate Password
+					</button>
+				</div>
+
+				<div className="grid grid-cols-2 gap-3 w-full">
+					<button
+						onClick={() => setHasSmalls(!hasSmalls)}
+						className={`text-white rounded-lg font-semibold px-4 py-2 duration-300 ${hasSmalls
+								? "bg-green-500 hover:bg-green-600"
+								: "bg-red-500 hover:bg-red-600"
+							}`}
+					>
+						{hasSmalls ? "Exclude Lowercase" : "Include Lowercase"}
+					</button>
+					<button
+						onClick={() => setHasCapitals(!hasCapitals)}
+						className={`text-white rounded-lg font-semibold px-4 py-2 duration-300 ${hasCapitals
+								? "bg-green-500 hover:bg-green-600"
+								: "bg-red-500 hover:bg-red-600"
+							}`}
+					>
+						{hasCapitals ? "Exclude Uppercase" : "Include Uppercase"}
+					</button>
+					<button
+						onClick={() => setHasNumbers(!hasNumbers)}
+						className={`text-white rounded-lg font-semibold px-4 py-2 duration-300 ${hasNumbers
+								? "bg-green-500 hover:bg-green-600"
+								: "bg-red-500 hover:bg-red-600"
+							}`}
+					>
+						{hasNumbers ? "Exclude Numbers" : "Include Numbers"}
+					</button>
+					<button
+						onClick={() => setHasSpecials(!hasSpecials)}
+						className={`text-white rounded-lg font-semibold px-4 py-2 duration-300 ${hasSpecials
+								? "bg-green-500 hover:bg-green-600"
+								: "bg-red-500 hover:bg-red-600"
+							}`}
+					>
+						{hasSpecials
+							? "Exclude Special Characters"
+							: "Include Special Characters"}
+					</button>
+				</div>
+
+				<div className="flex flex-col items-center w-full">
 					<input
 						type="range"
-						min="8"
-						max="20"
+						min="5"
+						max="25"
 						value={passLength}
-						onChange={(e) => setPassLength(Number(e.target.value))}
-						className='w-64 cursor-pointer'
+						onChange={(e) => setPassLength(e.target.value)}
+						className="w-full cursor-pointer accent-yellow-500"
 					/>
-					<span className='text-white font-semibold'>{passLength}</span>
-
+					<span className="text-white font-semibold mt-2">{passLength}</span>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 
