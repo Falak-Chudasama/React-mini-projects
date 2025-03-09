@@ -4,6 +4,7 @@ import About from './About.jsx';
 import Contact from "./Contact.jsx";
 import Footer from "./Footer.jsx";
 import Params from "./Params.jsx";
+import Github from "./Github.jsx";
 
 export {
     Header,
@@ -11,5 +12,6 @@ export {
     About,
     Contact,
     Params,
+    Github,
     Footer
 }
