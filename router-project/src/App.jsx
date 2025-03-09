@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Header, Home, About, Contact, Footer } from  './components/index.js';
 
 function App() {
     return(
-        <>
-            <h1 className='text-9xl font-extrabold text-center'>Router Project</h1>
-        </>
+        <Router>
+            <Header></Header>
+			<Footer></Footer>
+        </Router>
     );
 }
 
