@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 const ThemeContext = createContext({
-    themeMode: 'light',
+    themeMode: '',
     lightMode: () => {},
     darkMode: () => {}
 });
