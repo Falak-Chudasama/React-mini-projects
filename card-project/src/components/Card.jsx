@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTheme } from '../context/themeContext.js';
 
 export default function Card() {
     return (
